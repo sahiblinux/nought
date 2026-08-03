@@ -1,0 +1,467 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  NOUGHT — COMPLETE SETUP GUIDE                               ║
+# ║  Your Supabase project: nulcaofuybdxzuhkrmee.supabase.co     ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+This guide has every step, every click, every key you need.
+No guessing. Follow it top to bottom and you'll have a working app.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1 — GET YOUR SUPABASE KEYS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Go to: https://supabase.com/dashboard
+
+You'll see a list of your projects. Click the one that starts
+with "nulcaofuybdxzuhkrmee" (or whatever name you gave it).
+
+Once inside the project, look at the LEFT SIDEBAR:
+
+  ┌─────────────────────┐
+  │  🏠 Home            │
+  │  📊 Table Editor    │
+  │  🔐 Authentication  │
+  │  📁 Storage         │
+  │  ⚡ Edge Functions  │
+  │  📈 Realtime        │
+  │  ⚙️  Settings  ←── │  CLICK THIS
+  └─────────────────────┘
+
+Click ⚙️ Settings at the very bottom of the sidebar.
+
+Now look at the SETTINGS submenu (appears at the top):
+
+  ┌──────────────────────┐
+  │  General             │
+  │  Database            │
+  │  API  ←─────────────│  CLICK THIS
+  │  Auth                │
+  │  Storage             │
+  │  Logs                │
+  └──────────────────────┘
+
+Click "API".
+
+You'll now see a page with several sections. Here's what to copy:
+
+╔═══════════════════════════════════════════════════════════╗
+║  SECTION: "Project URL"                                  ║
+║                                                           ║
+║  You'll see a box like:                                   ║
+║  https://nulcaofuybdxzuhkrmee.supabase.co                ║
+║                                                           ║
+║  This is your → NEXT_PUBLIC_SUPABASE_URL                 ║
+║  Also your    → VITE_SUPABASE_URL                        ║
+║  (same value for both)                                    ║
+╚═══════════════════════════════════════════════════════════╝
+
+╔═══════════════════════════════════════════════════════════╗
+║  SECTION: "Project API keys"                              ║
+║                                                           ║
+║  You'll see TWO rows:                                     ║
+║                                                           ║
+║  ┌──────────────┬──────────────────────────────────┐      ║
+║  │ anon public  │  eyJhbGciOiJIUzI1NiIs...        │      ║
+║  └──────────────┴──────────────────────────────────┘      ║
+║  This is your → NEXT_PUBLIC_SUPABASE_ANON_KEY            ║
+║  Also your    → VITE_SUPABASE_ANON_KEY                   ║
+║  (same value for both)                                    ║
+║                                                           ║
+║  ┌──────────────┬──────────────────────────────────┐      ║
+║  │ service_role  │  eyJhbGciOiJIUzI1NiIs...        │      ║
+║  └──────────────┴──────────────────────────────────┘      ║
+║  This is your → SUPABASE_SERVICE_ROLE_KEY                ║
+║                                                           ║
+║  ⚠️  The service_role key is a SECRET.                   ║
+║  Never put it in frontend code or share it publicly.      ║
+╚═══════════════════════════════════════════════════════════╝
+
+Write all three values down. You'll need them in every step below.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 2 — CREATE YOUR DATABASE TABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Still in your Supabase project dashboard.
+
+Look at the LEFT SIDEBAR again:
+
+  ┌─────────────────────┐
+  │  🏠 Home            │
+  │  📊 Table Editor    │
+  │  🔐 Authentication  │
+  │  📁 Storage         │
+  │  ⚡ Edge Functions  │
+  │  📈 Realtime        │
+  │  🔌 SQL Editor ←── │  CLICK THIS
+  │  ⚙️  Settings       │
+  └─────────────────────┘
+
+Click "SQL Editor" (it has a plug/database icon).
+
+If you've never used it, you'll see a blank editor with a
+"New query" button. Click that.
+
+Now: open the file called `schema.sql` from the downloaded
+code. It's in the ROOT folder of the project.
+
+  nought-code/
+  ├── schema.sql   ← THIS ONE
+  ├── api/
+  ├── src/
+  └── ...
+
+Copy the ENTIRE contents of schema.sql and paste it into
+the Supabase SQL Editor.
+
+Click the green "Run" button (or press Ctrl+Enter).
+
+You should see a success message. If you see any errors
+that say "already exists", that's fine — it means the table
+was already created.
+
+To verify it worked, click "Table Editor" in the sidebar.
+You should see these tables listed:
+
+  ✅ languages
+  ✅ modules
+  ✅ curriculum_modules
+  ✅ lessons
+  ✅ achievements
+  ✅ profiles
+  ✅ progress
+  ✅ submissions
+  ✅ user_achievements
+  ✅ run_events
+  ✅ accounts
+  ✅ otps
+
+If you see all 12, you're good. They'll be empty — we fill
+them in Step 3.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 3 — FILL THE DATABASE WITH CURRICULUM CONTENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The app needs lesson data (programming exercises, solutions,
+etc.) in the database. There are two ways to do this:
+
+─── OPTION A: Use the seed script (recommended) ───
+
+1. Open the downloaded code folder on your computer.
+
+2. Find the file `.env` in the root folder. It should
+   already exist. Edit it and replace the three Supabase
+   values with YOUR keys from Step 1:
+
+   NEXT_PUBLIC_SUPABASE_URL=https://nulcaofuybdxzuhkrmee.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+   VITE_SUPABASE_URL=https://nulcaofuybdxzuhkrmee.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+3. Open a terminal/command prompt in the code folder.
+
+4. Run:  npm install
+
+5. Run:  node gen/seed.mjs
+
+   This will print progress as it uploads all lessons for
+   Python, C, C++, Java, and Rust. It takes about 2-3
+   minutes.
+
+6. When it says "Done", go back to Supabase Table Editor
+   and check the "languages" table — you should see 5 rows.
+
+─── OPTION B: Copy data from this project's database ───
+
+If you can't run node locally, you can export data from
+the current Supabase project and import it into yours.
+
+In Supabase dashboard → Database → Backups → or use
+pg_dump/pg_restore with the connection string from
+Settings → Database → Connection string.
+
+This is more complex — use Option A if possible.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 4 — CHOOSE YOUR DEPLOYMENT PLATFORM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You have two options. Here's the honest comparison:
+
+┌───────────────────┬──────────────────────┬──────────────────────┐
+│                   │  CLOUDFLARE PAGES    │  GITHUB PAGES        │
+├───────────────────┼──────────────────────┼──────────────────────┤
+│ Frontend (React)  │ ✅ Yes               │ ✅ Yes               │
+│ API routes        │ ✅ Yes (Workers)     │ ❌ No (static only)  │
+│ Separate API host │ No — one platform    │ Yes — need Vercel too│
+│ Free tier         │ 500K requests/mo     │ Unlimited static     │
+│ Custom domain     │ ✅ Free              │ ✅ Free              │
+│ Setup difficulty  │ Medium               │ Easy + Vercel needed │
+│ Recommendation    │ ⭐ BEST CHOICE       │ Works but split      │
+└───────────────────┴──────────────────────┴──────────────────────┘
+
+I RECOMMEND CLOUDFLARE PAGES. Everything in one place.
+Continue to Step 5A for Cloudflare, or 5B for GitHub Pages.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 5A — DEPLOY TO CLOUDFLARE PAGES (recommended)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+─── 5A.1 — Push code to GitHub ───
+
+1. Go to https://github.com and sign in (or create account)
+
+2. Click the "+" icon (top right) → "New repository"
+
+3. Name it: nought-code
+   Make it Private (recommended) or Public
+   Do NOT check "Add a README" or .gitignore
+   Click "Create repository"
+
+4. Open a terminal in the downloaded code folder and run:
+
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/YOUR-USERNAME/nought-code.git
+   git branch -M main
+   git push -u origin main
+
+   (Replace YOUR-USERNAME with your GitHub username)
+
+─── 5A.2 — Connect Cloudflare Pages ───
+
+1. Go to https://dash.cloudflare.com and sign in
+   (Create account if you don't have one — free)
+
+2. In the LEFT sidebar, click "Workers & Pages"
+
+3. Click the "Create" button
+
+4. Choose "Connect to Git"
+
+5. Connect your GitHub account if prompted
+   (Cloudflare will ask for repo access — grant it)
+
+6. Select your "nought-code" repository
+
+7. You'll see a configuration form. Fill it in:
+
+   ┌─────────────────────────────────────────────────────┐
+   │  Project name:  nought-code                         │
+   │                                                     │
+   │  Production branch:  main                           │
+   │                                                     │
+   │  Build command:  npm run build                      │
+   │                                                     │
+   │  Build output directory:  dist                      │
+   │                                                     │
+   │  Framework preset:  None                            │
+   └─────────────────────────────────────────────────────┘
+
+8. BEFORE clicking "Save and Deploy", scroll down to
+   "Environment variables". Add these 5:
+
+   ┌──────────────────────────────────┬──────────────────────────────────────────────────┐
+   │  Variable name                   │  Value                                           │
+   ├──────────────────────────────────┼──────────────────────────────────────────────────┤
+   │  NEXT_PUBLIC_SUPABASE_URL        │  https://nulcaofuybdxzuhkrmee.supabase.co       │
+   │  NEXT_PUBLIC_SUPABASE_ANON_KEY   │  (your anon key from Step 1)                     │
+   │  SUPABASE_SERVICE_ROLE_KEY       │  (your service role key from Step 1)             │
+   │  VITE_SUPABASE_URL               │  https://nulcaofuybdxzuhkrmee.supabase.co       │
+   │  VITE_SUPABASE_ANON_KEY          │  (your anon key from Step 1)                     │
+   └──────────────────────────────────┴──────────────────────────────────────────────────┘
+
+9. Click "Save and Deploy"
+
+   Cloudflare will now build your app. This takes 1-2 minutes.
+   You'll see a build log scrolling by.
+
+10. ⚠️  IMPORTANT — After the first deploy, you need to
+    enable the Node.js compatibility flag. Without this,
+    your API routes will crash.
+
+    Go to: Workers & Pages → nought-code → Settings
+
+    Scroll down to "Compatibility flags" or "Compatibility date"
+
+    Add the flag:  nodejs_compat
+
+    (Click "Add" or "Edit", type "nodejs_compat", save)
+
+    Then go to the "Deployments" tab and click
+    "Retry deployment" on the latest one.
+
+11. When the build succeeds, Cloudflare gives you a URL like:
+    https://nought-code.pages.dev
+
+    Visit it. You should see the Nought app! 🎉
+
+    Test it: click Python, try the first lesson, run code.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 5B — DEPLOY TO GITHUB PAGES (alternative)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GitHub Pages can ONLY serve static files. It CANNOT run
+your API routes. So you need TWO platforms:
+
+  Frontend → GitHub Pages (static files)
+  API      → Vercel (serverless functions)
+
+─── 5B.1 — Deploy API to Vercel ───
+
+1. Go to https://vercel.com and sign in with GitHub
+
+2. Click "Add New" → "Project" → import your nought-code repo
+
+3. Configure:
+   - Framework: Other
+   - Root directory: . (leave default)
+   - Build command: npm run build
+   - Output directory: dist
+
+4. Add the same 5 environment variables as in Step 5A.2
+
+5. Deploy. Note your Vercel URL, e.g.:
+   https://nought-code.vercel.app
+
+─── 5B.2 — Deploy frontend to GitHub Pages ───
+
+1. In the code, open `.env` and add:
+
+   VITE_API_BASE=https://nought-code.vercel.app
+
+   (This tells the frontend to call Vercel for API requests)
+
+2. Open `vite.config.ts` and add the `base` option:
+
+   Change the return block to include:
+     base: '/nought-code/',
+
+   (This is needed because GitHub Pages serves from
+   /nought-code/ not /)
+
+3. Rebuild:  npm run build
+
+4. Push to GitHub:  git add . && git commit && git push
+
+5. Go to your GitHub repo → Settings → Pages
+
+6. Under "Source", select "GitHub Actions" or
+   "Deploy from a branch" → main → / (root)
+
+7. Wait 1-2 minutes. Your site will be at:
+   https://YOUR-USERNAME.github.io/nought-code/
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 6 — SET UP A CUSTOM DOMAIN (optional)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+─── Cloudflare Pages ───
+
+1. Workers & Pages → nought-code → Custom domains
+2. Click "Add domain"
+3. Enter your domain (e.g. nought.yourdomain.com)
+4. Cloudflare will give you a DNS record to add
+5. Add it in your domain registrar's DNS settings
+6. Wait for DNS to propagate (usually minutes, sometimes hours)
+
+─── GitHub Pages ───
+
+1. GitHub repo → Settings → Pages → Custom domain
+2. Enter your domain
+3. Add a CNAME record in your DNS pointing to:
+   YOUR-USERNAME.github.io
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 7 — OPTIONAL: EMAIL FOR SIGN-UP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Right now, when users sign up, the verification code is
+shown on-screen (in a highlighted box). This works fine
+for testing.
+
+To send real emails:
+
+1. Go to https://resend.com and create a free account
+   (100 emails/day free)
+
+2. Get your API key from the Resend dashboard
+
+3. Verify your sending domain in Resend
+   (they'll give you DNS records to add)
+
+4. Add to your deployment platform's environment variables:
+
+   RESEND_API_KEY=re_xxxxxxxx
+   MAIL_FROM=Nought <noreply@yourdomain.com>
+
+5. Redeploy (push a commit or retry the deployment)
+
+Now users get real verification emails instead of on-screen codes.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 8 — UPDATING THE APP (adding features later)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+When you add features here and want to update your deployed app:
+
+1. Download the updated code from here
+2. Replace the files in your local folder
+3. Run:  git add . && git commit -m "Added X" && git push
+4. Cloudflare/GitHub Pages auto-rebuilds and deploys
+
+THAT'S IT. Your database is never touched.
+
+If the new feature needs a new database table, I'll tell you
+the SQL to run. You paste it in Supabase SQL Editor and click
+Run. 10 seconds. Done.
+
+Your existing data (users, progress, accounts) is NEVER affected
+by a code deploy. The database and the code are completely
+separate things.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ QUICK REFERENCE — ALL YOUR KEYS IN ONE PLACE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your Supabase project URL:
+  https://nulcaofuybdxzuhkrmee.supabase.co
+
+Where to find each key:
+  ┌──────────────────────────────┬───────────────────────────────────┐
+  │  Key                         │  Where in Supabase                │
+  ├──────────────────────────────┼───────────────────────────────────┤
+  │  NEXT_PUBLIC_SUPABASE_URL    │  Settings → API → Project URL    │
+  │  VITE_SUPABASE_URL           │  Same as above                   │
+  │  NEXT_PUBLIC_SUPABASE_ANON_KEY│ Settings → API → anon public key │
+  │  VITE_SUPABASE_ANON_KEY      │  Same as above                   │
+  │  SUPABASE_SERVICE_ROLE_KEY   │  Settings → API → service_role   │
+  └──────────────────────────────┴───────────────────────────────────┘
+
+Other keys (optional):
+  ┌──────────────────────────────┬───────────────────────────────────┐
+  │  RESEND_API_KEY              │  resend.com dashboard → API Keys  │
+  │  JUDGE0_URL                  │  Default: https://ce.judge0.com   │
+  │  JUDGE0_KEY                  │  Only if self-hosting Judge0      │
+  └──────────────────────────────┴───────────────────────────────────┘
+
+Environment variables to set on deployment platform:
+  - NEXT_PUBLIC_SUPABASE_URL
+  - NEXT_PUBLIC_SUPABASE_ANON_KEY
+  - SUPABASE_SERVICE_ROLE_KEY
+  - VITE_SUPABASE_URL
+  - VITE_SUPABASE_ANON_KEY
+  (Plus RESEND_API_KEY and MAIL_FROM if using email)
