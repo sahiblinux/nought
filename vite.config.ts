@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 function localApiPlugin() {
   return {
     name: 'local-api',
+    apply: 'serve',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url || '';
