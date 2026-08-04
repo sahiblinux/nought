@@ -12,7 +12,7 @@ function localApiPlugin() {
         if (!url.startsWith('/api/') && url !== '/api') return next();
 
         if (!server._apiHandler) {
-          const mod = await import('./api/[[...path]].js');
+          const mod = await import(['.', 'api', '[[...path]].js'].join('/'));
           server._apiHandler = mod.default;
         }
 
