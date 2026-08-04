@@ -1,9 +1,265 @@
+<<<<<<< HEAD
 import supabase from '../lib/db-client.js';
 import { applyCors, resolveIdentity, requireIdentity, sendError, isGuestKey } from '../lib/_auth.js';
 import { sendEmail, otpEmail, tempPasswordEmail } from '../lib/_email.js';
 import { checkRunLimit, clientIp } from '../lib/_ratelimit.js';
 import crypto from 'crypto';
 
+=======
+import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
+
+
+
+
+
+
+
+/* ─── inlined lib modules ─── */
+
+/* db-client */
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    global: {
+      fetch: async (url, options) => {
+        const res = await fetch(url, options);
+        return res;
+      },
+    },
+  }
+);
+
+/* _auth */
+/**
+ * Identity resolution.
+ */
+
+const GUEST_RE = /^guest_[a-z0-9]{6,32}$/;
+
+function applyCors(req, res, methods = 'GET, POST, OPTIONS') {
+  const origin = process.env.ALLOWED_ORIGIN || '*';
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Methods', `${methods}`);
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Guest-Key');
+  res.setHeader('Vary', 'Origin');
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return true;
+  }
+  return false;
+}
+
+function bearer(req) {
+  const h = req.headers.authorization || req.headers.Authorization || '';
+  if (!h.startsWith('Bearer ')) return '';
+  return h.slice(7).trim();
+}
+
+function guestFrom(req) {
+  const raw = String(req.headers['x-guest-key'] || req.query?.guest_key || '').trim();
+  return GUEST_RE.test(raw) ? raw : '';
+}
+
+async function resolveIdentity(req) {
+  const token = bearer(req);
+
+  if (token) {
+    const { data, error } = await supabase.auth.getUser(token);
+    if (error || !data?.user) {
+      const err = new Error('Session expired. Please sign in again.');
+      err.status = 401;
+      throw err;
+    }
+    const u = data.user;
+    return {
+      userKey: u.id,
+      isGuest: false,
+      email: u.email || null,
+      displayName:
+        u.user_metadata?.full_name ||
+        u.user_metadata?.name ||
+        (u.email ? u.email.split('@')[0] : 'Learner'),
+    };
+  }
+
+  const guest = guestFrom(req);
+  if (guest) {
+    return { userKey: guest, isGuest: true, email: null, displayName: 'Guest learner' };
+  }
+
+  return null;
+}
+
+async function requireIdentity(req) {
+  const id = await resolveIdentity(req);
+  if (!id) {
+    const err = new Error('Unauthorized');
+    err.status = 401;
+    throw err;
+  }
+  return id;
+}
+
+function sendError(res, err, fallback = 'Something went wrong.') {
+  const status = err?.status || 500;
+  if (status >= 500) console.error('api error:', err);
+  return res.status(status).json({ error: status >= 500 ? fallback : err.message });
+}
+
+const isGuestKey = (k) => GUEST_RE.test(String(k || ''));
+
+/* _email */
+/**
+ * Email helper. Uses Resend when RESEND_API_KEY is configured.
+ */
+
+const FROM = process.env.MAIL_FROM || 'Nought <onboarding@resend.dev>';
+
+async function sendEmail({ to, subject, html, text }) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) {
+    return { sent: false, dev: true };
+  }
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${key}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ from: FROM, to, subject, html, text }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    console.error('email send failed:', res.status, body);
+    throw new Error('Could not send email.');
+  }
+  return { sent: true };
+}
+
+function otpEmail(code) {
+  return {
+    subject: `Your Nought verification code: ${code}`,
+    text: `Welcome to Nought! Your verification code is ${code}. It expires in 10 minutes.`,
+    html: `
+      <div style="font-family:Georgia,serif;max-width:420px;margin:0 auto;padding:32px 24px;background:#f5f3ef;border-radius:12px">
+        <h1 style="font-size:22px;color:#1c1b17;margin:0 0 8px">Nought</h1>
+        <p style="font-size:14px;color:#45423b;margin:0 0 24px">Verify your email address</p>
+        <div style="text-align:center;background:#fbfaf8;border:1px solid #e2ded5;border-radius:8px;padding:24px;margin:0 0 24px">
+          <p style="font-family:monospace;font-size:32px;letter-spacing:8px;color:#a1573a;margin:0">${code}</p>
+        </div>
+        <p style="font-size:13px;color:#837e74;margin:0">Enter this code to finish creating your account. It expires in 10 minutes.</p>
+      </div>`,
+  };
+}
+
+function tempPasswordEmail(password) {
+  return {
+    subject: 'Your temporary Nought password',
+    text: `Your temporary password is: ${password}. Sign in and go to Settings to change it.`,
+    html: `
+      <div style="font-family:Georgia,serif;max-width:420px;margin:0 auto;padding:32px 24px;background:#f5f3ef;border-radius:12px">
+        <h1 style="font-size:22px;color:#1c1b17;margin:0 0 8px">Nought</h1>
+        <p style="font-size:14px;color:#45423b;margin:0 0 24px">Password reset</p>
+        <div style="text-align:center;background:#fbfaf8;border:1px solid #e2ded5;border-radius:8px;padding:24px;margin:0 0 24px">
+          <p style="font-family:monospace;font-size:20px;color:#a1573a;margin:0">${password}</p>
+        </div>
+        <p style="font-size:13px;color:#837e74;margin:0">Sign in with your username and this password, then go to Settings to set a new one.</p>
+      </div>`,
+  };
+}
+
+/* _ratelimit */
+const MEM = new Map();
+const MEM_WINDOW_MS = 10_000;
+const MEM_MAX = 6;
+
+function memAllow(key) {
+  const now = Date.now();
+  const hits = (MEM.get(key) || []).filter((t) => now - t < MEM_WINDOW_MS);
+  hits.push(now);
+  MEM.set(key, hits);
+  if (MEM.size > 500) {
+    for (const [k, v] of MEM) {
+      if (!v.length || now - v[v.length - 1] > 60_000) MEM.delete(k);
+    }
+  }
+  return hits.length <= MEM_MAX;
+}
+
+const LIMITS = {
+  perMinute: Number(process.env.RUN_LIMIT_PER_MINUTE || 12),
+  perDay: Number(process.env.RUN_LIMIT_PER_DAY || 400),
+};
+
+async function checkRunLimit(userKey, ip) {
+  if (!memAllow(`${userKey}|${ip}`)) {
+    return {
+      ok: false,
+      status: 429,
+      message: 'Slow down a moment — too many runs in a few seconds.',
+      retryAfter: 10,
+    };
+  }
+
+  const nowIso = new Date().toISOString();
+  const minuteAgo = new Date(Date.now() - 60_000).toISOString();
+  const dayAgo = new Date(Date.now() - 86_400_000).toISOString();
+
+  try {
+    const [{ count: lastMinute }, { count: lastDay }] = await Promise.all([
+      supabase
+        .from('run_events')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_key', userKey)
+        .gte('created_at', minuteAgo),
+      supabase
+        .from('run_events')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_key', userKey)
+        .gte('created_at', dayAgo),
+    ]);
+
+    if ((lastMinute || 0) >= LIMITS.perMinute) {
+      return {
+        ok: false,
+        status: 429,
+        message: `Rate limit reached (${LIMITS.perMinute} runs per minute). Try again shortly.`,
+        retryAfter: 30,
+      };
+    }
+    if ((lastDay || 0) >= LIMITS.perDay) {
+      return {
+        ok: false,
+        status: 429,
+        message: `Daily run limit reached (${LIMITS.perDay}). It resets 24 hours after your first run today.`,
+        retryAfter: 3600,
+      };
+    }
+
+    await supabase.from('run_events').insert({ user_key: userKey, created_at: nowIso });
+
+    if (Math.random() < 0.02) {
+      await supabase
+        .from('run_events')
+        .delete()
+        .lt('created_at', new Date(Date.now() - 2 * 86_400_000).toISOString());
+    }
+  } catch (e) {
+    console.error('rate limit check failed (allowing):', e.message);
+  }
+
+  return { ok: true };
+}
+
+function clientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
+  return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
+}
+
+>>>>>>> 7d99c40 (serverless issue)
 /* ─── helpers ─── */
 const today = () => new Date().toISOString().slice(0, 10);
 const yesterday = () => new Date(Date.now() - 86400000).toISOString().slice(0, 10);

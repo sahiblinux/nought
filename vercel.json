@@ -1,4 +1,11 @@
 {
+  "framework": "vite",
+  "functions": {
+    "api/[[...path]].js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
   "env": {
     "NEXT_PUBLIC_SUPABASE_URL": "https://ytqsgqpupqytdcgmooac.supabase.co",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_0HCNjaJN33Mv6uFr0u3r-w_SWMxVRku",
