@@ -2,13 +2,22 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/((?!api(/|$)).*)", "destination": "/index.html" }
+    { "source": "/learn/:lang", "destination": "/index.html" },
+    { "source": "/learn/:lang/:slug", "destination": "/index.html" },
+    { "source": "/playground", "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" },
+    { "source": "/settings", "destination": "/index.html" },
+    { "source": "/leaderboard", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/signup", "destination": "/index.html" },
+    { "source": "/forgot-password", "destination": "/index.html" }
   ],
   "functions": {
-    "api/[[...path]].js": {
-      "memory": 1024,
-      "maxDuration": 30,
-      "runtime": "nodejs20.x"
+    "api/[...path].js": {
+      "maxDuration": 30
+    },
+    "api/auth/*.js": {
+      "maxDuration": 30
     }
   },
   "env": {
