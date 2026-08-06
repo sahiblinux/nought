@@ -12,16 +12,27 @@ export async function onRequestPost(context) {
     if (!username || !password) return json({ error: 'Username and password are required.' }, 400);
 
     const { data: account, error: accErr } = await supabase
-      .from('accounts').select('email, email_verified, user_key').eq('username', username).maybeSingle();
+      .from('accounts').select('email, user_key').eq('username', username).maybeSingle();
     if (accErr) throw accErr;
     if (!account) return json({ error: 'No account found with that username.' }, 401);
-    if (!account.email_verified) return json({
-      error: 'Please verify your email first. Check your inbox for the code.',
-      needs_verification: true, email: account.email,
-    }, 403);
 
     const { data, error } = await supabase.auth.signInWithPassword({ email: account.email, password });
-    if (error) return json({ error: 'Incorrect password.' }, 401);
+    if (error) {
+      // Legacy accounts created before email verification was removed may still be
+      // unconfirmed in Supabase (email_confirm:false). Auto-confirm and retry once
+      // so those users aren't locked out.
+      if (/confirm|verify/i.test(error.message)) {
+        await supabase.auth.admin.updateUserById(account.user_key, { email_confirm: true });
+        const retry = await supabase.auth.signInWithPassword({ email: account.email, password });
+        if (retry.error) return json({ error: 'Incorrect password.' }, 401);
+        return json({
+          access_token: retry.data.session.access_token,
+          refresh_token: retry.data.session.refresh_token,
+          user: { id: retry.data.user.id, email: retry.data.user.email },
+        });
+      }
+      return json({ error: 'Incorrect password.' }, 401);
+    }
 
     return json({
       access_token: data.session.access_token,

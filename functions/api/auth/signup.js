@@ -1,4 +1,4 @@
-import { createSupabase, json, optionsResponse, errorResponse, getBody, sendEmailBestEffort, otpEmail } from '../_lib.js';
+import { createSupabase, json, optionsResponse, errorResponse, getBody } from '../_lib.js';
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
@@ -23,7 +23,7 @@ export async function onRequestPost(context) {
     if (existingEmail) return json({ error: 'An account with that email already exists.' }, 409);
 
     const { data: authData, error: authErr } = await supabase.auth.admin.createUser({
-      email, password, email_confirm: false, user_metadata: { username },
+      email, password, email_confirm: true, user_metadata: { username },
     });
     if (authErr) {
       if (authErr.message.includes('already')) return json({ error: 'An account with that email already exists.' }, 409);
@@ -32,7 +32,7 @@ export async function onRequestPost(context) {
 
     const userKey = authData.user.id;
     const { error: accErr } = await supabase.from('accounts').insert({
-      username, email, user_key: userKey, email_verified: false,
+      username, email, user_key: userKey, email_verified: true,
     });
     if (accErr) throw accErr;
 
@@ -42,13 +42,7 @@ export async function onRequestPost(context) {
       created_at: new Date().toISOString(),
     });
 
-    const code = String(Math.floor(100000 + Math.random() * 900000));
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-    await supabase.from('otps').insert({ email, code, purpose: 'signup', expires_at: expiresAt, used: false });
-
-    const emailResult = await sendEmailBestEffort({ to: email, ...otpEmail(code) }, context.env);
-
-    return json({ ok: true, email, dev_otp: emailResult.dev ? code : undefined }, 201);
+    return json({ ok: true, email }, 201);
   } catch (err) {
     return errorResponse(err, 'Could not create your account.');
   }

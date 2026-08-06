@@ -21,8 +21,6 @@ import * as leaderboard from '../functions/api/leaderboard.js';
 import * as authMe from '../functions/api/auth/me.js';
 import * as signup from '../functions/api/auth/signup.js';
 import * as login from '../functions/api/auth/login.js';
-import * as verifyOtp from '../functions/api/auth/verify-otp.js';
-import * as resendOtp from '../functions/api/auth/resend-otp.js';
 import * as forgotPassword from '../functions/api/auth/forgot-password.js';
 import * as changePassword from '../functions/api/auth/change-password.js';
 import * as deleteAccount from '../functions/api/auth/delete-account.js';
@@ -41,8 +39,6 @@ const ROUTES = {
   'GET auth/me': authMe,
   'POST auth/signup': signup,
   'POST auth/login': login,
-  'POST auth/verify-otp': verifyOtp,
-  'POST auth/resend-otp': resendOtp,
   'POST auth/forgot-password': forgotPassword,
   'POST auth/change-password': changePassword,
   'POST auth/delete-account': deleteAccount,

@@ -10,8 +10,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [needsVerification, setNeedsVerification] = useState(false);
-  const [verifyEmail, setVerifyEmail] = useState('');
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -44,7 +42,6 @@ export default function Login() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setNeedsVerification(false);
     if (!username || !password) {
       setError('Enter your username and password.');
       return;
@@ -55,19 +52,10 @@ export default function Login() {
         access_token: string;
         refresh_token: string;
         user: { id: string; email: string };
-        needs_verification?: boolean;
-        email?: string;
       }>('/api/auth/login', {
         username: username.toLowerCase(),
         password,
       });
-
-      if (res.needs_verification && res.email) {
-        setNeedsVerification(true);
-        setVerifyEmail(res.email);
-        setBusy(false);
-        return;
-      }
 
       await supabase.auth.setSession({
         access_token: res.access_token,
@@ -121,72 +109,57 @@ export default function Login() {
       <div className="rounded-xl border border-line bg-surface p-7">
         <h2 className="font-serif text-xl tracking-tight text-ink">Sign in</h2>
 
-        {needsVerification ? (
-          <div className="mt-5 rounded-lg border border-clay/20 bg-clay/5 px-4 py-3">
-            <p className="text-[13px] text-clay">
-              Please verify your email first. We sent a code to{' '}
-              <span className="font-medium">{verifyEmail}</span>.
-            </p>
-            <Link
-              to="/signup"
-              className="mt-2 inline-block font-mono text-[10.5px] uppercase tracking-[0.14em] text-clay underline decoration-clay/25 underline-offset-4 hover:decoration-clay"
-            >
-              Go to verification
-            </Link>
+        <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
+          <div>
+            <label htmlFor="username" className={labelCls}>Username</label>
+            <div className="relative">
+              <User size={15} className="absolute left-3.5 top-[14px] text-faint" />
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="your_username"
+                autoComplete="username"
+                className={`${inputCls} pl-10`}
+              />
+            </div>
           </div>
-        ) : (
-          <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
-            <div>
-              <label htmlFor="username" className={labelCls}>Username</label>
-              <div className="relative">
-                <User size={15} className="absolute left-3.5 top-[14px] text-faint" />
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="your_username"
-                  autoComplete="username"
-                  className={`${inputCls} pl-10`}
-                />
-              </div>
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className={labelCls}>Password</label>
+              <Link
+                to="/forgot-password"
+                className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-clay"
+              >
+                Forgot?
+              </Link>
             </div>
-            <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className={labelCls}>Password</label>
-                <Link
-                  to="/forgot-password"
-                  className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-clay"
-                >
-                  Forgot?
-                </Link>
-              </div>
-              <div className="relative">
-                <KeyRound size={15} className="absolute left-3.5 top-[14px] text-faint" />
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Your password"
-                  autoComplete="current-password"
-                  className={`${inputCls} pl-10`}
-                />
-              </div>
+            <div className="relative">
+              <KeyRound size={15} className="absolute left-3.5 top-[14px] text-faint" />
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
+                autoComplete="current-password"
+                className={`${inputCls} pl-10`}
+              />
             </div>
+          </div>
 
-            {error && <p className="text-[12.5px] text-clay">{error}</p>}
+          {error && <p className="text-[12.5px] text-clay">{error}</p>}
 
-            <button
-              type="submit"
-              disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-ink py-2.5 text-[13.5px] text-paper transition-opacity hover:opacity-88 disabled:opacity-50"
-            >
-              {busy && <Loader2 size={13} className="animate-spin" />}
-              Sign in
-            </button>
-          </form>
-        )}
+          <button
+            type="submit"
+            disabled={busy}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-ink py-2.5 text-[13.5px] text-paper transition-opacity hover:opacity-88 disabled:opacity-50"
+          >
+            {busy && <Loader2 size={13} className="animate-spin" />}
+            Sign in
+          </button>
+        </form>
 
         <p className="mt-5 text-center text-[12.5px] text-muted">
           No account?{' '}

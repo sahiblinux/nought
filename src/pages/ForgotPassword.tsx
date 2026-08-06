@@ -65,7 +65,7 @@ export default function ForgotPassword() {
           {devPassword && (
             <div className="mt-3 rounded border border-moss/15 bg-paper px-3 py-2">
               <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-                Dev mode — temp password
+                Email delivery unavailable — temp password
               </p>
               <p className="mt-0.5 font-mono text-[16px] text-moss">{devPassword}</p>
             </div>
