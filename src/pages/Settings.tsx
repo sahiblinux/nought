@@ -155,16 +155,6 @@ export default function Settings() {
                 )}
               </dd>
             </div>
-            <div>
-              <dt className={labelCls}>Email verified</dt>
-              <dd className="mt-1 text-[14px]">
-                {account?.email_verified ? (
-                  <span className="text-moss">Yes</span>
-                ) : (
-                  <span className="text-clay">No</span>
-                )}
-              </dd>
-            </div>
           </dl>
         </section>
 
