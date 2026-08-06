@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Check,
 } from 'lucide-react';
+import PasswordInput from '../components/PasswordInput';
 import { api, postJson } from '../lib/api';
 import supabase from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -167,9 +168,8 @@ export default function Settings() {
           <form onSubmit={handleChangePassword} className="mt-5 space-y-3" noValidate>
             <div>
               <label htmlFor="current-pw" className={labelCls}>Current password</label>
-              <input
+              <PasswordInput
                 id="current-pw"
-                type="password"
                 value={currentPw}
                 onChange={(e) => setCurrentPw(e.target.value)}
                 className={inputCls}
@@ -177,9 +177,8 @@ export default function Settings() {
             </div>
             <div>
               <label htmlFor="new-pw" className={labelCls}>New password</label>
-              <input
+              <PasswordInput
                 id="new-pw"
-                type="password"
                 value={newPw}
                 onChange={(e) => setNewPw(e.target.value)}
                 placeholder="At least 6 characters"
@@ -188,9 +187,8 @@ export default function Settings() {
             </div>
             <div>
               <label htmlFor="confirm-pw" className={labelCls}>Confirm new password</label>
-              <input
+              <PasswordInput
                 id="confirm-pw"
-                type="password"
                 value={confirmPw}
                 onChange={(e) => setConfirmPw(e.target.value)}
                 className={inputCls}
@@ -254,17 +252,16 @@ export default function Settings() {
           </p>
           {confirmDelete ? (
             <div className="mt-4 space-y-3">
-              <div>
-                <label htmlFor="delete-pw" className={labelCls}>Your password</label>
-                <input
-                  id="delete-pw"
-                  type="password"
-                  value={deletePw}
-                  onChange={(e) => setDeletePw(e.target.value)}
-                  placeholder="Confirm with your password"
-                  className={inputCls}
-                />
-              </div>
+            <div>
+              <label htmlFor="delete-pw" className={labelCls}>Your password</label>
+              <PasswordInput
+                id="delete-pw"
+                value={deletePw}
+                onChange={(e) => setDeletePw(e.target.value)}
+                placeholder="Confirm with your password"
+                className={inputCls}
+              />
+            </div>
               {deleteError && <p className="text-[12.5px] text-clay">{deleteError}</p>}
               <div className="flex gap-3">
                 <button

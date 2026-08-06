@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, User, KeyRound } from 'lucide-react';
+import PasswordInput from '../components/PasswordInput';
 import supabase from '../lib/supabase';
 import { postJson } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -137,9 +138,8 @@ export default function Login() {
             </div>
             <div className="relative">
               <KeyRound size={15} className="absolute left-3.5 top-[14px] text-faint" />
-              <input
+              <PasswordInput
                 id="password"
-                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Your password"

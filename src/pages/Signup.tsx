@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, Mail, User, KeyRound } from 'lucide-react';
+import PasswordInput from '../components/PasswordInput';
 import { postJson } from '../lib/api';
 import supabase from '../lib/supabase';
 
@@ -110,19 +111,17 @@ export default function Signup() {
           </div>
         </div>
         <div>
-          <label htmlFor="password" className={labelCls}>Password</label>
-          <div className="relative">
-            <KeyRound size={15} className="absolute left-3.5 top-[14px] text-faint" />
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 6 characters"
-              autoComplete="new-password"
-              className={`${inputCls} pl-10`}
-            />
-          </div>
+          <label htmlFor="password" className={labelCls}>Password</label>            <div className="relative">
+              <KeyRound size={15} className="absolute left-3.5 top-[14px] text-faint" />
+              <PasswordInput
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 6 characters"
+                autoComplete="new-password"
+                className={`${inputCls} pl-10`}
+              />
+            </div>
         </div>
 
         {error && <p className="text-[12.5px] text-clay">{error}</p>}
