@@ -1,4 +1,4 @@
-import { createSupabase, json, optionsResponse, errorResponse, getBody, sendEmail, tempPasswordEmail } from '../_lib.js';
+import { createSupabase, json, optionsResponse, errorResponse, getBody, sendEmailBestEffort, tempPasswordEmail } from '../_lib.js';
 
 export async function onRequestOptions() { return optionsResponse(); }
 
@@ -20,7 +20,9 @@ export async function onRequestPost(context) {
     const { error: updErr } = await supabase.auth.admin.updateUserById(account.user_key, { password: tempPassword });
     if (updErr) throw updErr;
 
-    const emailResult = await sendEmail({ to: account.email, ...tempPasswordEmail(tempPassword) }, context.env);
+    // The password is already reset above; if email delivery fails, surface the
+    // temp password on screen so the user isn't locked out.
+    const emailResult = await sendEmailBestEffort({ to: account.email, ...tempPasswordEmail(tempPassword) }, context.env);
 
     return json({ ok: true, dev_password: emailResult.dev ? tempPassword : undefined });
   } catch (err) {

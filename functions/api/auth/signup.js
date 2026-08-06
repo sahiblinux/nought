@@ -1,4 +1,4 @@
-import { createSupabase, json, optionsResponse, errorResponse, getBody, sendEmail, otpEmail } from '../_lib.js';
+import { createSupabase, json, optionsResponse, errorResponse, getBody, sendEmailBestEffort, otpEmail } from '../_lib.js';
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
@@ -46,7 +46,7 @@ export async function onRequestPost(context) {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
     await supabase.from('otps').insert({ email, code, purpose: 'signup', expires_at: expiresAt, used: false });
 
-    const emailResult = await sendEmail({ to: email, ...otpEmail(code) }, context.env);
+    const emailResult = await sendEmailBestEffort({ to: email, ...otpEmail(code) }, context.env);
 
     return json({ ok: true, email, dev_otp: emailResult.dev ? code : undefined }, 201);
   } catch (err) {

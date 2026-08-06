@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, User, KeyRound } from 'lucide-react';
 import supabase from '../lib/supabase';
 import { postJson } from '../lib/api';
-import { signInWithGoogle } from '../lib/googleAuth';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
@@ -109,7 +108,7 @@ export default function Login() {
           {[
             'Progress, XP, streaks and badges follow your account',
             'Guest progress is migrated on first sign-in',
-            'Username + password, or one-tap Google',
+            'Username + password',
           ].map((t) => (
             <li key={t} className="flex gap-3 text-[13.5px] text-ink-soft">
               <span className="mt-[9px] h-[3px] w-[3px] shrink-0 rounded-full bg-clay" />
@@ -199,36 +198,6 @@ export default function Login() {
           </Link>
         </p>
 
-        <div className="my-5 flex items-center gap-3">
-          <span className="h-px flex-1 bg-line" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">or</span>
-          <span className="h-px flex-1 bg-line" />
-        </div>
-
-        <button
-          onClick={() => signInWithGoogle('Nought')}
-          className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-line bg-paper py-2.5 text-[13.5px] text-ink transition-colors hover:border-ink/25"
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden>
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.57c2.08-1.92 3.27-4.74 3.27-8.09z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.76c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.2 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.29 9.14 5.38 12 5.38z"
-            />
-          </svg>
-          Continue with Google
-        </button>
       </div>
     </div>
   );

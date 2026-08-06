@@ -128,6 +128,18 @@ export async function sendEmail({ to, subject, html, text }, env) {
   return { sent: true };
 }
 
+/** Best-effort send: if delivery fails (unverified sender, invalid key, etc.),
+ *  fall back to dev mode so callers can show the code/temp password on screen
+ *  instead of failing the whole request after rows were already written. */
+export async function sendEmailBestEffort(msg, env) {
+  try {
+    return await sendEmail(msg, env);
+  } catch (err) {
+    console.error('email send failed, falling back to on-screen code:', err.message);
+    return { sent: false, dev: true };
+  }
+}
+
 export function otpEmail(code) {
   return {
     subject: `Your Nought verification code: ${code}`,
