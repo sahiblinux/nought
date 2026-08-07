@@ -103,7 +103,7 @@ export default function Profile() {
               />
               <div>
                 <h1 className="font-serif text-[2rem] leading-tight tracking-tight text-ink">
-                  {user?.email?.split('@')[0] || profile.display_name}
+                  {profile.display_name || user?.email?.split('@')[0] || 'Learner'}
                 </h1>
                 <p className="mt-1 text-[13.5px] text-muted">
                   {rankOf(profile.xp)} · {profile.xp} XP · {xpToNext} to level{' '}

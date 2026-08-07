@@ -84,6 +84,7 @@ export async function resolveIdentity(request, supabase) {
       isGuest: false,
       email: u.email || null,
       displayName:
+        u.user_metadata?.username ||
         u.user_metadata?.full_name ||
         u.user_metadata?.name ||
         (u.email ? u.email.split('@')[0] : 'Learner'),
